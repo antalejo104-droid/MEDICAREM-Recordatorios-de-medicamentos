@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "MEDICAREM"
+description = "Panel web accesible para organizar medicamentos, revisar eventos registrados y acompañar a personas mayores mediante autorizaciones explícitas de cuidadores."
+version = "1.0.0"
+id = "artifacts/medicarem-web"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20947
+
+[services.development]
+run = "pnpm --filter @workspace/medicarem-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/medicarem-web", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/medicarem-web/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20947"
+BASE_PATH = "/"

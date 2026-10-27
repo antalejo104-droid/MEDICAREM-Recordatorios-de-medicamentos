@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: medicarem
+    description: Medication organization, event tracking, and caregiver access
 paths:
   /healthz:
     get:
@@ -24,7 +26,371 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /medicarem/profile:
+    get:
+      operationId: getProfile
+      tags: [medicarem]
+      summary: Get the signed-in user's profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: saveProfile
+      tags: [medicarem]
+      summary: Create or update the signed-in user's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileInput"
+      responses:
+        "200":
+          description: Saved profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /medicarem/dashboard:
+    get:
+      operationId: getDashboard
+      tags: [medicarem]
+      summary: Get a current user's dashboard summary
+      parameters:
+        - name: patientId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dashboard summary and recent events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /medicarem/medications:
+    get:
+      operationId: listMedications
+      tags: [medicarem]
+      summary: List active and inactive medications visible to the current user
+      parameters:
+        - name: patientId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Medication list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Medication"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: createMedication
+      tags: [medicarem]
+      summary: Add a medication and its schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedicationInput"
+      responses:
+        "201":
+          description: Created medication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medication"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /medicarem/medications/{id}:
+    patch:
+      operationId: updateMedication
+      tags: [medicarem]
+      summary: Update a medication and its schedule
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedicationUpdate"
+      responses:
+        "200":
+          description: Updated medication
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medication"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deactivateMedication
+      tags: [medicarem]
+      summary: Deactivate a medication without deleting its history
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Medication deactivated
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /medicarem/events:
+    get:
+      operationId: listEvents
+      tags: [medicarem]
+      summary: List medication events with optional history filters
+      parameters:
+        - name: patientId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/EventStatus"
+        - name: medicationId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Medication events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MedicationEvent"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: recordEvent
+      tags: [medicarem]
+      summary: Record a confirmation or declared omission for a scheduled event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventRecordInput"
+      responses:
+        "200":
+          description: Recorded event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedicationEvent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /medicarem/sync:
+    post:
+      operationId: syncEvents
+      tags: [medicarem]
+      summary: Idempotently synchronize locally recorded event responses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncInput"
+      responses:
+        "200":
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /medicarem/caregiver-invitations:
+    get:
+      operationId: listCaregiverInvitations
+      tags: [medicarem]
+      summary: List invitations and caregiver authorizations visible to the current user
+      responses:
+        "200":
+          description: Invitations and relationships
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CaregiverInvitation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: createCaregiverInvitation
+      tags: [medicarem]
+      summary: Create a one-time caregiver invitation code
+      responses:
+        "201":
+          description: Invitation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaregiverInvitation"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /medicarem/caregiver-invitations/redeem:
+    post:
+      operationId: redeemCaregiverInvitation
+      tags: [medicarem]
+      summary: Request caregiver access using an invitation code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitationCodeInput"
+      responses:
+        "201":
+          description: Access request submitted for approval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaregiverInvitation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /medicarem/caregiver-invitations/{id}:
+    patch:
+      operationId: updateCaregiverInvitation
+      tags: [medicarem]
+      summary: Approve or revoke caregiver access
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitationUpdate"
+      responses:
+        "200":
+          description: Updated authorization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaregiverInvitation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Access is not authorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +399,182 @@ components:
           type: string
       required:
         - status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    UserRole:
+      type: string
+      enum: [PATIENT, CAREGIVER]
+    EventStatus:
+      type: string
+      enum: [PENDING, CONFIRMED, DECLARED_OMISSION, UNCONFIRMED]
+    InvitationStatus:
+      type: string
+      enum: [PENDING, ACTIVE, REVOKED]
+    Profile:
+      type: object
+      properties:
+        id: { type: integer }
+        clerkUserId: { type: string }
+        displayName: { type: string }
+        role: { $ref: "#/components/schemas/UserRole" }
+        timezone: { type: string }
+        largeText: { type: boolean }
+        notificationsEnabled: { type: boolean }
+        lastSyncedAt: { type: ["string", "null"], format: date-time }
+      required: [id, clerkUserId, displayName, role, timezone, largeText, notificationsEnabled]
+    ProfileInput:
+      type: object
+      properties:
+        displayName: { type: string, minLength: 1, maxLength: 80 }
+        role: { $ref: "#/components/schemas/UserRole" }
+        timezone: { type: string, minLength: 1 }
+        largeText: { type: boolean }
+        notificationsEnabled: { type: boolean }
+      required: [displayName, role, timezone, largeText, notificationsEnabled]
+    Schedule:
+      type: object
+      properties:
+        id: { type: integer }
+        time: { type: string, pattern: "^[0-2][0-9]:[0-5][0-9]$" }
+        weekdays:
+          type: array
+          items: { type: integer, minimum: 0, maximum: 6 }
+        startDate: { type: string, format: date }
+        endDate: { type: ["string", "null"], format: date }
+      required: [id, time, weekdays, startDate]
+    ScheduleInput:
+      type: object
+      properties:
+        time: { type: string, pattern: "^[0-2][0-9]:[0-5][0-9]$" }
+        weekdays:
+          type: array
+          items: { type: integer, minimum: 0, maximum: 6 }
+        startDate: { type: string, format: date }
+        endDate: { type: ["string", "null"], format: date }
+      required: [time, weekdays, startDate]
+    Medication:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        presentation: { type: string }
+        prescribedDose: { type: string }
+        notes: { type: ["string", "null"] }
+        active: { type: boolean }
+        startDate: { type: string, format: date }
+        endDate: { type: ["string", "null"], format: date }
+        schedules:
+          type: array
+          items: { $ref: "#/components/schemas/Schedule" }
+        createdAt: { type: string, format: date-time }
+      required: [id, name, presentation, prescribedDose, active, startDate, schedules, createdAt]
+    MedicationInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        presentation: { type: string, maxLength: 120 }
+        prescribedDose: { type: string, minLength: 1, maxLength: 120 }
+        notes: { type: ["string", "null"], maxLength: 1000 }
+        startDate: { type: string, format: date }
+        endDate: { type: ["string", "null"], format: date }
+        schedules:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/ScheduleInput" }
+      required: [name, presentation, prescribedDose, startDate, schedules]
+    MedicationUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        presentation: { type: string, maxLength: 120 }
+        prescribedDose: { type: string, minLength: 1, maxLength: 120 }
+        notes: { type: ["string", "null"], maxLength: 1000 }
+        active: { type: boolean }
+        startDate: { type: string, format: date }
+        endDate: { type: ["string", "null"], format: date }
+        schedules:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/ScheduleInput" }
+    MedicationEvent:
+      type: object
+      properties:
+        id: { type: integer }
+        externalId: { type: string }
+        medicationId: { type: integer }
+        medicationName: { type: string }
+        prescribedDose: { type: string }
+        scheduledAt: { type: string, format: date-time }
+        status: { $ref: "#/components/schemas/EventStatus" }
+        reportedAt: { type: ["string", "null"], format: date-time }
+        patientName: { type: ["string", "null"] }
+      required: [id, externalId, medicationId, medicationName, prescribedDose, scheduledAt, status]
+    EventRecordInput:
+      type: object
+      properties:
+        eventId: { type: integer }
+        status:
+          type: string
+          enum: [CONFIRMED, DECLARED_OMISSION]
+        clientEventId: { type: string, minLength: 1 }
+        reportedAt: { type: string, format: date-time }
+      required: [eventId, status, clientEventId]
+    SyncInput:
+      type: object
+      properties:
+        events:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/EventRecordInput"
+      required: [events]
+    SyncResult:
+      type: object
+      properties:
+        processed: { type: integer }
+        duplicates: { type: integer }
+        lastSyncedAt: { type: string, format: date-time }
+      required: [processed, duplicates, lastSyncedAt]
+    Dashboard:
+      type: object
+      properties:
+        patientName: { type: string }
+        todayScheduled: { type: integer }
+        confirmed: { type: integer }
+        declaredOmissions: { type: integer }
+        pending: { type: integer }
+        activeMedications: { type: integer }
+        lastSyncedAt: { type: ["string", "null"], format: date-time }
+        recentEvents:
+          type: array
+          items: { $ref: "#/components/schemas/MedicationEvent" }
+      required: [patientName, todayScheduled, confirmed, declaredOmissions, pending, activeMedications, recentEvents]
+    CaregiverInvitation:
+      type: object
+      properties:
+        id: { type: integer }
+        code: { type: ["string", "null"] }
+        patientId: { type: integer }
+        patientName: { type: string }
+        caregiverId: { type: ["integer", "null"] }
+        caregiverName: { type: ["string", "null"] }
+        status: { $ref: "#/components/schemas/InvitationStatus" }
+        createdAt: { type: string, format: date-time }
+      required: [id, patientId, patientName, status, createdAt]
+    InvitationCodeInput:
+      type: object
+      properties:
+        code: { type: string, minLength: 6, maxLength: 16 }
+      required: [code]
+    InvitationUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ACTIVE, REVOKED]
+      required: [status]
 
