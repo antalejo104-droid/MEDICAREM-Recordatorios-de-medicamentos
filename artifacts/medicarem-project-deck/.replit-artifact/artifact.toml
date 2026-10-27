@@ -1,0 +1,28 @@
+kind = "slides"
+previewPath = "/medicarem-project-deck/"
+title = "MEDICAREM — Prototipo y validación"
+description = "Presentación breve en español sobre el prototipo MEDICAREM, su experiencia web y móvil, control de acceso para cuidadores y estado de validación."
+version = "1.0.0"
+id = "artifacts/medicarem-project-deck"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/medicarem-project-deck/" ]
+localPort = 21096
+
+[services.development]
+run = "pnpm --filter @workspace/medicarem-project-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/medicarem-project-deck", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/medicarem-project-deck/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21096"
+BASE_PATH = "/medicarem-project-deck/"
