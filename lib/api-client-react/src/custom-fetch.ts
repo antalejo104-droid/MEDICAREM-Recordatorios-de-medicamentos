@@ -22,7 +22,7 @@ let _authTokenGetter: AuthTokenGetter | null = null;
  * Set a base URL that is prepended to every relative request URL
  * (i.e. paths that start with `/`).
  *
- * Useful for Expo bundles that need to call a remote API server.
+ * Useful when requests use a different API origin.
  * Pass `null` to clear the base URL.
  */
 export function setBaseUrl(url: string | null): void {
@@ -34,7 +34,7 @@ export function setBaseUrl(url: string | null): void {
  * the getter is invoked; when it returns a non-null string, an
  * `Authorization: Bearer <token>` header is attached to the request.
  *
- * Useful for Expo bundles making token-gated API calls.
+ * Useful for requests that use bearer-token authentication.
  * Pass `null` to clear the getter.
  *
  * NOTE: This function should never be used in web applications where session
@@ -54,8 +54,7 @@ function resolveMethod(input: RequestInfo | URL, explicitMethod?: string): strin
   return "GET";
 }
 
-// Use loose check for URL — some runtimes (e.g. React Native) polyfill URL
-// differently, so `instanceof URL` can fail.
+// Some runtimes polyfill URL differently, so `instanceof URL` can fail.
 function isUrl(input: RequestInfo | URL): input is URL {
   return typeof URL !== "undefined" && input instanceof URL;
 }
@@ -112,11 +111,9 @@ function isTextMediaType(mediaType: string | null): boolean {
 }
 
 // Use strict equality: in browsers, `response.body` is `null` when the
-// response genuinely has no content.  In React Native, `response.body` is
-// always `undefined` because the ReadableStream API is not implemented —
-// even when the response carries a full payload readable via `.text()` or
-// `.json()`.  Loose equality (`== null`) matches both `null` and `undefined`,
-// which causes every React Native response to be treated as empty.
+// response genuinely has no content. Some fetch implementations leave
+// `response.body` undefined even when the payload is available via `.text()`
+// or `.json()`. Loose equality (`== null`) matches both `null` and `undefined`.
 function hasNoBody(response: Response, method: string): boolean {
   if (method === "HEAD") return true;
   if (NO_BODY_STATUS.has(response.status)) return true;
@@ -258,7 +255,7 @@ async function parseErrorBody(response: Response, method: string): Promise<unkno
 
   const mediaType = getMediaType(response.headers);
 
-  // Fall back to text when blob() is unavailable (e.g. some React Native builds).
+  // Fall back to text when blob() is unavailable.
   if (mediaType && !isJsonMediaType(mediaType) && !isTextMediaType(mediaType)) {
     return typeof response.blob === "function" ? response.blob() : response.text();
   }

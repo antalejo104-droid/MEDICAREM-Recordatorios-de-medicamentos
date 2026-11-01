@@ -2,7 +2,7 @@
 
 **Versión del plan:** 1.0  
 **Fecha:** 26 de octubre de 2026  
-**Resultado actual:** 10 pruebas unitarias automatizadas de fecha y zona horaria aprobadas; las 30 pruebas de aceptación siguientes están pendientes de ejecución.
+**Resultado actual:** 10 pruebas unitarias automatizadas de fecha y zona horaria aprobadas; las 28 pruebas de aceptación siguientes están pendientes de ejecución.
 
 ## Pruebas automatizadas ejecutadas
 
@@ -17,9 +17,9 @@ Comando: `pnpm --filter @workspace/api-server test`
 | Zona horaria | fecha local de Colombia y conversión a UTC | Aprobado |
 | Ventanas diarias | día de Colombia y transiciones DST de 23/25 horas | Aprobado |
 
-Verificación estática adicional ejecutada: `typecheck` de API, web y móvil. Esto no reemplaza pruebas de rutas, permisos, persistencia ni pruebas de aceptación.
+Verificación estática adicional ejecutada: `typecheck` de API y web. Esto no reemplaza pruebas de rutas, permisos, persistencia ni pruebas de aceptación.
 
-## Matriz de aceptación — 30 escenarios
+## Matriz de aceptación — 28 escenarios
 
 Los escenarios marcados **Pendiente** requieren ejecución manual con cuentas ficticias en una base de desarrollo aislada. No introducir datos de pacientes reales. Guardar evidencia de cada ejecución (fecha, versión, dispositivo/navegador, pasos, resultado y captura sin datos identificables).
 
@@ -51,16 +51,13 @@ Los escenarios marcados **Pendiente** requieren ejecución manual con cuentas fi
 | A24 | Cuidador intenta leer datos antes de aprobación | La API deniega el acceso aunque el cliente envíe un `patientId` | Pendiente |
 | A25 | Paciente aprueba una solicitud | El cuidador autorizado puede consultar únicamente ese perfil | Pendiente |
 | A26 | Paciente revoca una autorización activa | Las siguientes solicitudes del cuidador se deniegan de inmediato | Pendiente |
-| A27 | Registrar evento descargado mientras el móvil está sin conexión | El evento queda en cola local y se muestra como pendiente de sincronización | Pendiente |
-| A28 | Reiniciar la app mientras hay eventos en cola | La cola persiste; en iOS/Android el contenido del evento permanece en SecureStore | Pendiente |
-| A29 | Reconectar y volver a sincronizar el mismo lote | La API procesa de forma idempotente y la cola solo se elimina tras éxito | Pendiente |
-| A30 | Revisar notificación local, permiso denegado y texto grande | El permiso es optativo; la notificación no revela medicamento ni dosis; lectura y controles siguen siendo utilizables | Pendiente |
+| A27 | Registrar un evento descargado desde la Website sin conexión | El evento queda en la cola del navegador y aparece la opción para sincronizarlo | Pendiente |
+| A28 | Volver a enviar la misma cola de eventos | La API procesa de forma idempotente y el navegador solo elimina la cola tras una respuesta exitosa | Pendiente |
 
 ## Criterios de aceptación del piloto
 
-1. Ejecutar A01–A30 en desarrollo con al menos dos cuentas ficticias separadas (paciente y cuidador).
-2. Repetir los casos críticos A04, A14–A18, A24–A29 después de cualquier cambio de autorización, fechas o sincronización.
-3. Ejecutar en un Android físico y un iPhone físico antes de validar notificaciones y SecureStore para producción.
+1. Ejecutar A01–A28 en desarrollo con al menos dos cuentas ficticias separadas (paciente y cuidador).
+2. Repetir los casos críticos A04, A14–A18 y A24–A28 después de cualquier cambio de autorización, fechas o sincronización.
 4. Guardar incidencias y resultados sin nombres, correos, códigos ni identificadores de pacientes reales.
 5. Solicitar revisión de accesibilidad y pruebas moderadas con representantes del público objetivo, con consentimiento y protocolo aprobado.
 

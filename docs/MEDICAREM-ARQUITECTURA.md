@@ -8,7 +8,6 @@
 | Componente | Tecnología | Responsabilidad |
 |---|---|---|
 | Aplicación web | React, Vite, TypeScript | Acceso, perfil, medicamentos, historial y gestión de cuidadores |
-| Aplicación móvil | Expo, React Native, Expo Router | Las mismas tareas principales, recordatorios locales y registro sin conexión |
 | API | Express, TypeScript | Autenticación, validación, permisos, programación e historial |
 | Persistencia | PostgreSQL, Drizzle ORM | Perfiles, medicamentos, horarios, eventos, autorizaciones y auditoría |
 | Identidad | Clerk | Registro, inicio de sesión y sesión de usuario |
@@ -22,23 +21,19 @@ La configuración raíz de Vercel se mantiene conforme al requisito del proyecto
 3. La API genera eventos de horario y usa la zona horaria del perfil para fecharlos.
 4. El paciente puede confirmar una toma o marcar explícitamente que no la tomó. La falta de confirmación queda como **sin confirmar**; no se convierte automáticamente en una omisión.
 5. Un paciente puede crear un código para que un cuidador solicite acceso. El acceso solo se activa después de la aprobación del paciente y se puede revocar.
-6. La app móvil puede registrar una confirmación u omisión de un evento ya descargado mientras está sin conexión. Al reconectarse, sincroniza con un identificador idempotente.
 
 ## Acceso y privacidad técnica
 
 - Las rutas API requieren sesión autenticada y verifican permisos en el servidor; ocultar un control de interfaz no se considera autorización.
 - Los cuidadores solo acceden a perfiles con autorización activa.
-- Las notificaciones locales son optativas y no incluyen nombre del medicamento ni dosis.
-- En iOS y Android, la cola local guarda el contenido breve del evento en SecureStore; AsyncStorage conserva solo el índice de identificadores. En web se usa almacenamiento local del navegador, porque SecureStore no está disponible allí.
-- La cola offline no guarda nombre, presentación, dosis ni notas del medicamento. Los datos del evento siguen siendo sensibles y el almacenamiento del navegador no ofrece el mismo aislamiento que SecureStore.
-- La sesión móvil usa el almacenamiento seguro recomendado por Clerk/Expo.
+- La Website guarda en el navegador solo la cola de eventos pendientes: identificador del evento, estado e identificador idempotente. No conserva nombre, presentación, dosis ni notas del medicamento.
+- Los datos del evento siguen siendo sensibles; el almacenamiento local del navegador no ofrece el mismo aislamiento que un almacén seguro del sistema operativo.
 - El registro de auditoría no debe incluir dosis, notas ni otros datos clínicos innecesarios.
 
 ## Límites conocidos del prototipo
 
-- Sin conexión solo se pueden registrar eventos que ya se habían descargado; no se pueden crear medicamentos ni pautas nuevas sin conexión.
-- La app móvil programa notificaciones locales con permiso del sistema operativo. La web no implementa notificaciones push.
-- No se han ejecutado pruebas de aceptación con participantes, dispositivos físicos ni un entorno de producción.
+- Sin conexión, la Website puede poner en cola el registro de un evento descargado y la persona puede iniciar su sincronización cuando vuelve la conexión. No se pueden crear medicamentos ni pautas nuevas sin conexión.
+- No se han ejecutado pruebas de aceptación con participantes ni en un entorno de producción.
 - No se ha demostrado cumplimiento regulatorio ni una clasificación de dispositivo médico.
 - Las preferencias de texto grande están disponibles; aún se requiere una evaluación formal de contraste, navegación asistida y comprensión con personas mayores.
 - No se debe usar con datos clínicos reales hasta completar revisión de seguridad, privacidad, operación y consentimiento.

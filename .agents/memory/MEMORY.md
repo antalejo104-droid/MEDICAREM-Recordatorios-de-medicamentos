@@ -1,1 +1,2 @@
 - [MEDICAREM audience](medicarem-audience.md) — designed for adults over 60 and their caregivers in Pasto, Colombia.
+- [MEDICAREM platform scope](medicarem-scope.md) — keep MEDICAREM Website-only; preserve responsive Website behavior, not the native app.

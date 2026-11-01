@@ -52,7 +52,7 @@ async function recordEventForPatient(
     clientEventId: string;
     reportedAt?: string | Date;
   },
-  source: "web" | "mobile",
+  source: "web",
 ): Promise<{ event: typeof scheduledEventsTable.$inferSelect; duplicate: boolean }> {
   const reportedAt = input.reportedAt ? new Date(input.reportedAt) : new Date();
   if (Number.isNaN(reportedAt.getTime())) {
@@ -301,7 +301,7 @@ router.post("/sync", async (req, res): Promise<void> => {
   let duplicates = 0;
   try {
     for (const event of parsed.data.events) {
-      const result = await recordEventForPatient(viewer.id, event, "mobile");
+      const result = await recordEventForPatient(viewer.id, event, "web");
       if (result.duplicate) {
         duplicates += 1;
       } else {
