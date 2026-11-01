@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "id": "67e621fb-b029-4dd8-934c-0f8927de4ed0",
+    "position": 1,
+    "filepath": "src/pages/slides/Cover.tsx",
+    "title": "MEDICAREM",
+    "description": "MEDICAREM",
+    "speakerNotes": ""
+  },
+  {
+    "id": "4ec792e8-5726-4b7d-ac2c-447b0cab728b",
+    "position": 2,
+    "filepath": "src/pages/slides/Organization.tsx",
+    "title": "Organizar no es recomendar",
+    "description": "Organizar no es recomendar",
+    "speakerNotes": ""
+  },
+  {
+    "id": "dfbd826f-d383-4410-ab3f-c9f0b3079749",
+    "position": 3,
+    "filepath": "src/pages/slides/Permission.tsx",
+    "title": "Compartir solo con permiso",
+    "description": "Compartir solo con permiso",
+    "speakerNotes": ""
+  },
+  {
+    "id": "8653d1d3-213f-4ff2-a21b-b0e580fc69ad",
+    "position": 4,
+    "filepath": "src/pages/slides/Experience.tsx",
+    "title": "Web y móvil, una misma rutina",
+    "description": "Web y móvil, una misma rutina",
+    "speakerNotes": ""
+  },
+  {
+    "id": "52fae224-722f-46ad-b2d2-a3c88af28bb8",
+    "position": 5,
+    "filepath": "src/pages/slides/Validation.tsx",
+    "title": "Prototipo construido; validación pendiente",
+    "description": "Prototipo construido; validación pendiente",
+    "speakerNotes": ""
+  }
+]

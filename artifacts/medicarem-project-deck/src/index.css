@@ -11,15 +11,22 @@
 }
 
 :root {
-  /* Replace these with brand colors */
-  --slide-primary: #4f46e5;
-  --slide-accent: #06b6d4;
-  --slide-bg: #f8fafc;
-  --slide-text: #0f172a;
-  --slide-muted: #64748b;
-  --font-display-family: 'Inter', system-ui, sans-serif;
-  --font-body-family: 'Inter', system-ui, sans-serif;
+  --slide-primary: #326d64;
+  --slide-accent: #e2e8d8;
+  --slide-bg: #f7f5ed;
+  --slide-text: #1d433d;
+  --slide-muted: #5f716b;
+  --slide-forest: #1d433d;
+  --slide-panel-deep: #25564d;
+  --slide-peach: #f0e2d1;
+  --slide-border: #cbd5ca;
+  --font-display-family: 'Manrope', sans-serif;
+  --font-body-family: 'DM Sans', sans-serif;
   color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html,
@@ -33,6 +40,7 @@ body,
 body {
   background: var(--slide-bg);
   color: var(--slide-text);
+  font-family: var(--font-body-family);
 }
 
 .slide {
