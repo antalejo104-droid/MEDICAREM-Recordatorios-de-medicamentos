@@ -1,2 +1,3 @@
 - [MEDICAREM audience](medicarem-audience.md) — designed for adults over 60 and their caregivers in Pasto, Colombia.
 - [MEDICAREM platform scope](medicarem-scope.md) — keep MEDICAREM Website-only; preserve responsive Website behavior, not the native app.
+- [Workspace Vite build environment](workspace-vite-build.md) — root builds run without workflow-injected `PORT` and `BASE_PATH`; Vite configs need build-safe defaults.

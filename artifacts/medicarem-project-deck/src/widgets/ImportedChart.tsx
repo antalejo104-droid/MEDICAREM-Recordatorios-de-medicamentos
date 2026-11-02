@@ -18,6 +18,22 @@ import {
   YAxis,
   ZAxis,
 } from 'recharts';
+import type { ComponentType } from 'react';
+
+// Recharts' class component declarations resolve through a different React
+// peer context in this workspace; keep the runtime components, normalize only
+// their JSX boundary types.
+type RechartsElement = ComponentType<Record<string, unknown>>;
+const TooltipElement = Tooltip as unknown as RechartsElement;
+const LegendElement = Legend as unknown as RechartsElement;
+const XAxisElement = XAxis as unknown as RechartsElement;
+const YAxisElement = YAxis as unknown as RechartsElement;
+const ZAxisElement = ZAxis as unknown as RechartsElement;
+const ScatterElement = Scatter as unknown as RechartsElement;
+const LineElement = Line as unknown as RechartsElement;
+const AreaElement = Area as unknown as RechartsElement;
+const PieElement = Pie as unknown as RechartsElement;
+const BarElement = Bar as unknown as RechartsElement;
 
 interface ImportedSeries {
   name: string;
@@ -107,8 +123,8 @@ export default function ImportedChart({
     : undefined;
   const decorations = (
     <>
-      <Tooltip animationDuration={0} />
-      {chart.series.length > 1 ? <Legend /> : null}
+      <TooltipElement animationDuration={0} />
+      {chart.series.length > 1 ? <LegendElement /> : null}
     </>
   );
 
@@ -117,14 +133,14 @@ export default function ImportedChart({
     graphic = (
       <ScatterChart margin={common.margin}>
         <CartesianGrid stroke="#E2E8F0" strokeDasharray="4 4" />
-        <XAxis type="number" dataKey="x" tickLine={false} axisLine={false} />
-        <YAxis type="number" dataKey="y" tickLine={false} axisLine={false} />
+        <XAxisElement type="number" dataKey="x" tickLine={false} axisLine={false} />
+        <YAxisElement type="number" dataKey="y" tickLine={false} axisLine={false} />
         {chart.type === 'bubble' ? (
-          <ZAxis dataKey="z" range={[64, 400]} />
+          <ZAxisElement dataKey="z" range={[64, 400]} />
         ) : null}
         {decorations}
         {chart.series.map((series, index) => (
-          <Scatter
+          <ScatterElement
             key={seriesKey(index)}
             name={series.name}
             data={series.values.flatMap((y, pointIndex) => {
@@ -158,11 +174,11 @@ export default function ImportedChart({
           strokeDasharray="4 4"
           vertical={false}
         />
-        <XAxis dataKey="category" tickLine={false} axisLine={false} />
-        <YAxis tickLine={false} axisLine={false} tickFormatter={percentTick} />
+        <XAxisElement dataKey="category" tickLine={false} axisLine={false} />
+        <YAxisElement tickLine={false} axisLine={false} tickFormatter={percentTick} />
         {decorations}
         {chart.series.map((series, index) => (
-          <Line
+          <LineElement
             key={seriesKey(index)}
             dataKey={seriesKey(index)}
             name={series.name}
@@ -182,11 +198,11 @@ export default function ImportedChart({
           strokeDasharray="4 4"
           vertical={false}
         />
-        <XAxis dataKey="category" tickLine={false} axisLine={false} />
-        <YAxis tickLine={false} axisLine={false} tickFormatter={percentTick} />
+        <XAxisElement dataKey="category" tickLine={false} axisLine={false} />
+        <YAxisElement tickLine={false} axisLine={false} tickFormatter={percentTick} />
         {decorations}
         {chart.series.map((series, index) => (
-          <Area
+          <AreaElement
             key={seriesKey(index)}
             dataKey={seriesKey(index)}
             name={series.name}
@@ -208,9 +224,9 @@ export default function ImportedChart({
     });
     graphic = (
       <PieChart>
-        <Tooltip animationDuration={0} />
-        <Legend />
-        <Pie
+        <TooltipElement animationDuration={0} />
+        <LegendElement />
+        <PieElement
           data={data}
           dataKey="value"
           nameKey="name"
@@ -228,7 +244,7 @@ export default function ImportedChart({
               fill={palette[index % palette.length]}
             />
           ))}
-        </Pie>
+        </PieElement>
       </PieChart>
     );
   } else if (chart.type === 'bar') {
@@ -239,13 +255,13 @@ export default function ImportedChart({
           strokeDasharray="4 4"
           horizontal={false}
         />
-        <XAxis
+        <XAxisElement
           type="number"
           tickLine={false}
           axisLine={false}
           tickFormatter={percentTick}
         />
-        <YAxis
+        <YAxisElement
           type="category"
           dataKey="category"
           tickLine={false}
@@ -253,7 +269,7 @@ export default function ImportedChart({
         />
         {decorations}
         {chart.series.map((series, index) => (
-          <Bar
+          <BarElement
             key={seriesKey(index)}
             dataKey={seriesKey(index)}
             name={series.name}
@@ -276,11 +292,11 @@ export default function ImportedChart({
           strokeDasharray="4 4"
           vertical={false}
         />
-        <XAxis dataKey="category" tickLine={false} axisLine={false} />
-        <YAxis tickLine={false} axisLine={false} tickFormatter={percentTick} />
+        <XAxisElement dataKey="category" tickLine={false} axisLine={false} />
+        <YAxisElement tickLine={false} axisLine={false} tickFormatter={percentTick} />
         {decorations}
         {chart.series.map((series, index) => (
-          <Bar
+          <BarElement
             key={seriesKey(index)}
             dataKey={seriesKey(index)}
             name={series.name}
